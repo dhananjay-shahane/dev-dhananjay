@@ -9,17 +9,17 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Check if we're in Vercel production environment
-const isVercelProduction = process.env.VERCEL === '1';
+// Check if we're in a Vercel environment
+const isVercel = process.env.VERCEL === '1';
 
 export default defineConfig({
   plugins: [
     react(),
-    runtimeErrorOverlay(),
-    themePlugin(),
-    // Only include Replit-specific plugins when not in production or when in Replit
+    // Only include Replit-specific plugins when not in Vercel
+    ...(!isVercel ? [runtimeErrorOverlay(), themePlugin()] : []),
     ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
+    process.env.REPL_ID !== undefined &&
+    !isVercel
       ? [
           await import("@replit/vite-plugin-cartographer").then((m) =>
             m.cartographer(),
@@ -36,8 +36,8 @@ export default defineConfig({
   },
   root: path.resolve(__dirname, "client"),
   build: {
-    // For Vercel deployment, use a standard output directory
-    outDir: isVercelProduction ? "dist" : path.resolve(__dirname, "dist/public"),
+    // For Vercel, we want to output directly to dist
+    outDir: isVercel ? "../dist" : path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
