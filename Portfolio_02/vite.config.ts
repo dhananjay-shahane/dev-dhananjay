@@ -9,11 +9,15 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Check if we're in Vercel production environment
+const isVercelProduction = process.env.VERCEL === '1';
+
 export default defineConfig({
   plugins: [
     react(),
     runtimeErrorOverlay(),
     themePlugin(),
+    // Only include Replit-specific plugins when not in production or when in Replit
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -32,7 +36,8 @@ export default defineConfig({
   },
   root: path.resolve(__dirname, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    // For Vercel deployment, use a standard output directory
+    outDir: isVercelProduction ? "dist" : path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
