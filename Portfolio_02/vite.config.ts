@@ -36,8 +36,7 @@ export default defineConfig({
   },
   root: path.resolve(__dirname, "client"),
   build: {
-    // For Vercel, we want to output directly to dist
-    outDir: isVercel ? "../dist" : path.resolve(__dirname, "dist/public"),
+    outDir: "dist", // Keep it inside client/
     emptyOutDir: true,
   },
   server: {
